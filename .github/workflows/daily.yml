@@ -14,10 +14,13 @@ jobs:
           echo "Fetching number list..."
           curl -sS "https://textdb.online/XTCZYPK" > numbers.txt
 
-      - name: Fetch each number
+      - name: Fetch and update each number
         run: |
           while IFS= read -r number; do
             [ -z "$number" ] && continue
-            echo "Fetching: $number"
-            curl -sS "https://textdb.online/XTCZYPK${number}" || echo "Failed: $number"
+            echo "Processing: $number"
+            content=$(curl -sS "https://textdb.online/XTCZYPK${number}")
+            echo "Content: $content"
+            echo "$content" > "${number}.txt"
+            curl -sS -X POST "https://api.textdb.online/update?key=XTCZYPK${number}&value=${content}" || echo "Update failed: $number"
           done < numbers.txt
