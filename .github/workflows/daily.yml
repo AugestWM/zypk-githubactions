@@ -1,0 +1,23 @@
+name: Daily Fetch Numbers
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch number list
+        run: |
+          echo "Fetching number list..."
+          curl -sS "https://textdb.online/XTCZYPK" > numbers.txt
+
+      - name: Fetch each number
+        run: |
+          while IFS= read -r number; do
+            [ -z "$number" ] && continue
+            echo "Fetching: $number"
+            curl -sS "https://textdb.online/XTCZYPK${number}" || echo "Failed: $number"
+          done < numbers.txt
